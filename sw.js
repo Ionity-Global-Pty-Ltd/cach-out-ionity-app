@@ -1,12 +1,16 @@
-const CACHE_NAME = "cach-out-ionity-v1";
+const CACHE_NAME = "cach-out-ionity-v2";
 const OFFLINE_FILES = [
   "./",
   "./index.html",
   "./styles.css",
   "./app.js",
   "./manifest.webmanifest",
-  "./icons/icon.svg",
-  "./icons/icon-maskable.svg"
+  "./brand/variables.css",
+  "./icons/icon-192.png",
+  "./icons/icon-512.png",
+  "./icons/icon-maskable-512.png",
+  "./icons/ai-mark-white.png",
+  "./favicon.ico",
 ];
 
 self.addEventListener("install", (event) => {
@@ -20,29 +24,21 @@ self.addEventListener("install", (event) => {
 self.addEventListener("activate", (event) => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
-    await Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key)));
+    await Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)));
     await self.clients.claim();
   })());
 });
 
 self.addEventListener("fetch", (event) => {
-  if (event.request.method !== "GET") {
-    return;
-  }
-
+  if (event.request.method !== "GET") return;
   event.respondWith((async () => {
     const cache = await caches.open(CACHE_NAME);
     const cached = await cache.match(event.request);
-
-    if (cached) {
-      return cached;
+    if (cached) return cached;
+    const response = await fetch(event.request);
+    if (response.ok && event.request.url.startsWith(self.location.origin)) {
+      cache.put(event.request, response.clone());
     }
-
-    const networkResponse = await fetch(event.request);
-    if (networkResponse.ok && event.request.url.startsWith(self.location.origin)) {
-      cache.put(event.request, networkResponse.clone());
-    }
-
-    return networkResponse;
+    return response;
   })());
 });

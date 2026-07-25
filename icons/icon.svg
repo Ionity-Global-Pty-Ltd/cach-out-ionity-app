@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="CACH OUT Ionity App icon">
-  <rect width="512" height="512" rx="104" fill="#0b1310"/>
-  <rect x="48" y="48" width="416" height="416" rx="86" fill="#112019" stroke="#1f3b2f" stroke-width="14"/>
-  <path d="M144 272c0-61.86 50.14-112 112-112h112v56H256c-30.93 0-56 25.07-56 56s25.07 56 56 56h112v56H256c-61.86 0-112-50.14-112-112Z" fill="#00c76f"/>
-  <path d="M352 328h-74l29.5-56L352 328Zm-96 56h112v-22l-46-90h-52l-46 90v22Z" fill="#8df7bf"/>
-</svg>

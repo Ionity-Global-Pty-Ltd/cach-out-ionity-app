@@ -1,25 +1,33 @@
 {
   "name": "CACH OUT Ionity App",
   "short_name": "CACH OUT",
-  "description": "IONITY.co.za privacy reset PWA to clear cookies, cache data, local storage, and URL tracking strings.",
+  "description": "IONITY.co.za privacy reset PWA to clear cookies, cache storage, local data, service workers, and URL tracking strings.",
   "id": "/",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#070a09",
-  "theme_color": "#00c76f",
+  "orientation": "portrait-primary",
+  "background_color": "#0b0d12",
+  "theme_color": "#5746e3",
   "lang": "en-ZA",
+  "categories": ["utilities", "productivity", "security"],
   "icons": [
     {
-      "src": "./icons/icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "./icons/icon-maskable.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
       "purpose": "maskable"
     }
   ]

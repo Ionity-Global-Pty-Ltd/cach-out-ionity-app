@@ -2,45 +2,130 @@
 <html lang="en-ZA">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#00c76f">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#5746e3">
   <title>CACH OUT Ionity App</title>
-  <meta name="description" content="IONITY.co.za privacy reset PWA for clearing site cookies, cache storage, local data, and tracking strings.">
+  <meta name="description" content="IONITY.co.za privacy reset PWA for clearing site cookies, cache storage, local data, service workers and tracking strings — with an on-device AI privacy advisor.">
+
+  <!-- Open Graph / social -->
+  <meta property="og:title" content="CACH OUT Ionity App">
+  <meta property="og:description" content="One-click privacy reset for IONITY.co.za — clear cookies, cache, local data and tracking strings.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="./icons/social-card.png">
+  <meta name="twitter:card" content="summary_large_image">
+
   <link rel="manifest" href="./manifest.webmanifest">
-  <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
+  <link rel="icon" href="./favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png">
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
   <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
   <main class="app-shell">
     <header class="hero">
-      <p class="brand">IONITY.CO.ZA</p>
-      <h1>CACH OUT Ionity App</h1>
-      <p class="subtitle">A public Progressive Web App to wipe this site's browser data and tracking strings in one click.</p>
+      <div class="hero-brand">
+        <img class="brand-mark" src="./icons/ai-mark-white.png" alt="IONITY AI mark" width="48" height="48">
+        <div>
+          <p class="brand">IONITY GLOBAL · IONITY.CO.ZA</p>
+          <h1>CACH OUT Ionity App</h1>
+        </div>
+      </div>
+      <p class="subtitle">One-click privacy reset — wipe this site's cookies, caches, storage, service workers and tracking strings. Includes an on-device AI privacy advisor.</p>
     </header>
 
     <section class="panel">
-      <h2>Run cleanup</h2>
-      <label class="toggle">
-        <input id="remove-all-query-params" type="checkbox" checked>
-        <span>Remove all query strings and URL hash (recommended)</span>
-      </label>
+      <div class="panel-head">
+        <h2>Deep clean</h2>
+        <span id="storage-estimate" class="badge">storage: —</span>
+      </div>
+
+      <div class="options">
+        <label class="toggle">
+          <input id="opt-cookies" type="checkbox" checked>
+          <span>Cookies (current-site scope)</span>
+        </label>
+        <label class="toggle">
+          <input id="opt-storage" type="checkbox" checked>
+          <span>Local / session storage &amp; <code>window.name</code></span>
+        </label>
+        <label class="toggle">
+          <input id="opt-caches" type="checkbox" checked>
+          <span>CacheStorage buckets</span>
+        </label>
+        <label class="toggle">
+          <input id="opt-idb" type="checkbox" checked>
+          <span>IndexedDB databases</span>
+        </label>
+        <label class="toggle">
+          <input id="opt-sw" type="checkbox" checked>
+          <span>Service workers</span>
+        </label>
+        <label class="toggle">
+          <input id="opt-url" type="checkbox" checked>
+          <span>Remove URL query strings &amp; hash</span>
+        </label>
+        <label class="toggle">
+          <input id="opt-reload" type="checkbox">
+          <span>Hard reload (bypass HTTP cache) after clean</span>
+        </label>
+      </div>
 
       <div class="button-row">
-        <button id="deep-clean" class="primary" type="button">Deep clean now</button>
+        <button id="deep-clean" class="primary" type="button">⚡ Deep clean now</button>
         <button id="sanitize-url" class="secondary" type="button">Sanitize URL only</button>
+        <button id="hard-reload" class="ghost" type="button">Hard reload</button>
         <button id="install-app" class="ghost" type="button" hidden>Install app</button>
       </div>
 
       <p class="hint">
-        This app can clear data only for the current site scope. HttpOnly cookies and browser-wide cache still require browser settings.
+        A web page can only clear data for its own site scope. HttpOnly cookies, OS DNS cache, and browser-wide history need the OS/browser tools in the next panels.
       </p>
     </section>
 
+    <section class="panel ai-panel">
+      <div class="panel-head">
+        <h2>🤖 AI Privacy Advisor</h2>
+        <span id="ai-status" class="badge">on-device: checking…</span>
+      </div>
+      <p class="hint">Scans this site's cookies and storage, scores your privacy exposure, flags known trackers, and (when your browser supports on-device AI) explains findings in plain language. Runs 100% locally — nothing is uploaded.</p>
+      <div class="button-row">
+        <button id="ai-scan" class="primary" type="button">Scan &amp; analyse</button>
+        <button id="ai-explain" class="secondary" type="button" disabled>Explain with AI</button>
+      </div>
+
+      <div id="ai-score-wrap" class="score-wrap" hidden>
+        <div class="score-ring" id="score-ring"><span id="score-value">–</span></div>
+        <div class="score-copy">
+          <p id="score-label" class="score-label">Privacy score</p>
+          <p id="score-summary" class="hint"></p>
+        </div>
+      </div>
+
+      <ul id="ai-findings" class="result-list" aria-live="polite"></ul>
+      <div id="ai-explanation" class="ai-explanation" hidden></div>
+    </section>
+
     <section class="panel">
-      <h2>Latest run</h2>
+      <h2>🌐 DNS flush &amp; OS-level reset</h2>
+      <p class="hint">Browsers can't flush the operating-system DNS cache from JavaScript. Copy the command for your platform and run it in a terminal, or open the browser's internal DNS page.</p>
+      <div class="cmd-list" id="cmd-list"></div>
+      <div class="button-row">
+        <button class="ghost" type="button" data-open="chrome://net-internals/#dns">Open Chrome DNS</button>
+        <button class="ghost" type="button" data-open="about:networking#dns">Open Firefox DNS</button>
+        <button class="ghost" type="button" data-open="edge://net-internals/#dns">Open Edge DNS</button>
+      </div>
+      <p class="hint" id="open-note"></p>
+    </section>
+
+    <section class="panel">
+      <h2>Last run log</h2>
       <p id="last-run">Not run yet.</p>
       <ul id="result-list" class="result-list" aria-live="polite"></ul>
     </section>
+
+    <footer class="foot">
+      <p>© Ionity Global (Pty) Ltd · ionity.today · Everything runs locally in your browser.</p>
+    </footer>
   </main>
 
   <script type="module" src="./app.js"></script>
