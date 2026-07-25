@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en-ZA">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#00c76f">
+  <title>CACH OUT Ionity App</title>
+  <meta name="description" content="IONITY.co.za privacy reset PWA for clearing site cookies, cache storage, local data, and tracking strings.">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <main class="app-shell">
+    <header class="hero">
+      <p class="brand">IONITY.CO.ZA</p>
+      <h1>CACH OUT Ionity App</h1>
+      <p class="subtitle">A public Progressive Web App to wipe this site's browser data and tracking strings in one click.</p>
+    </header>
+
+    <section class="panel">
+      <h2>Run cleanup</h2>
+      <label class="toggle">
+        <input id="remove-all-query-params" type="checkbox" checked>
+        <span>Remove all query strings and URL hash (recommended)</span>
+      </label>
+
+      <div class="button-row">
+        <button id="deep-clean" class="primary" type="button">Deep clean now</button>
+        <button id="sanitize-url" class="secondary" type="button">Sanitize URL only</button>
+        <button id="install-app" class="ghost" type="button" hidden>Install app</button>
+      </div>
+
+      <p class="hint">
+        This app can clear data only for the current site scope. HttpOnly cookies and browser-wide cache still require browser settings.
+      </p>
+    </section>
+
+    <section class="panel">
+      <h2>Latest run</h2>
+      <p id="last-run">Not run yet.</p>
+      <ul id="result-list" class="result-list" aria-live="polite"></ul>
+    </section>
+  </main>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
