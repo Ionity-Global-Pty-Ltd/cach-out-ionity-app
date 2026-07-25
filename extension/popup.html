@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en-ZA">
+<head>
+  <meta charset="utf-8">
+  <title>CACH OUT Ionity</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header class="head">
+    <img src="icons/icon-48.png" width="34" height="34" alt="IONITY">
+    <div>
+      <p class="brand">IONITY GLOBAL</p>
+      <h1>CACH OUT</h1>
+    </div>
+  </header>
+
+  <label class="row">
+    <span>Time range</span>
+    <select id="range">
+      <option value="3600000">Last hour</option>
+      <option value="86400000">Last 24 hours</option>
+      <option value="604800000">Last 7 days</option>
+      <option value="0" selected>Everything</option>
+    </select>
+  </label>
+
+  <div class="types">
+    <label><input type="checkbox" data-type="cache" checked> Browser cache</label>
+    <label><input type="checkbox" data-type="cacheStorage" checked> CacheStorage (PWA)</label>
+    <label><input type="checkbox" data-type="cookies" checked> Cookies</label>
+    <label><input type="checkbox" data-type="localStorage" checked> Local storage</label>
+    <label><input type="checkbox" data-type="indexedDB" checked> IndexedDB</label>
+    <label><input type="checkbox" data-type="serviceWorkers" checked> Service workers</label>
+    <label><input type="checkbox" data-type="fileSystems"> File systems</label>
+    <label><input type="checkbox" data-type="webSQL"> WebSQL</label>
+    <label><input type="checkbox" data-type="formData"> Autofill form data</label>
+    <label><input type="checkbox" data-type="downloads"> Download history</label>
+    <label><input type="checkbox" data-type="history"> Browsing history</label>
+    <label><input type="checkbox" data-type="passwords"> Saved passwords</label>
+  </div>
+
+  <label class="reload-row">
+    <input type="checkbox" id="reload-tabs" checked>
+    <span>Reload all open tabs after cleaning</span>
+  </label>
+
+  <button id="cach-out" class="primary" type="button">⚡ CACH OUT now</button>
+  <button id="select-all" class="link" type="button">Select all</button>
+  <button id="select-safe" class="link" type="button">Safe defaults</button>
+
+  <p id="status" class="status"></p>
+
+  <p class="note">Clears data across <strong>all sites</strong> in this browser using the official <code>browsingData</code> API. Everything runs locally.</p>
+
+  <script src="popup.js"></script>
+</body>
+</html>

@@ -2,6 +2,28 @@
 
 Public Progressive Web App branded with the official **IONITY Global** design tokens and AI brand mark (ionity.co.za / ionity.today).
 
+## Two ways to use it
+
+**1. Browser extension (recommended — clears ALL sites).**
+See [`extension/`](./extension). Uses Chrome/Edge's official `browsingData` API to wipe
+cache, cookies, storage, IndexedDB and service workers across every site, and can reload
+all open tabs afterwards. Load unpacked from `chrome://extensions` (Developer mode).
+
+**2. Web PWA (this site — clears its own origin only).**
+A hosted page that resets its own site data and runs the on-device AI advisor. Browser
+security prevents any web page from touching other sites' data, so for cross-site cleaning
+use the extension above.
+
+## Three ways to run it
+
+| | Clears | Best for |
+| --- | --- | --- |
+| **Windows desktop app** ([`desktop/`](./desktop)) | DNS cache, every browser's cache/cookies, temp + thumbnail cache, Winsock/ARP, IP renew | Full OS-level reset |
+| **Browser extension** ([`extension/`](./extension)) | Cache, cookies, storage, IndexedDB, service workers across **all** sites | Cross-site browser cleanup |
+| **Web PWA** (this site) | This site's own data only + on-device AI advisor | Quick per-site reset |
+
+Download the desktop app: [`cach-out-ionity-desktop.zip`](./cach-out-ionity-desktop.zip) — unzip and run `CACH-OUT-Ionity.bat`.
+
 ## Features
 
 **Deep clean (selectable):**

@@ -63,6 +63,32 @@ body {
   box-shadow: var(--ionity-shadow-md);
 }
 .ai-panel { border-color: var(--ionity-border-light); }
+
+/* Extension banner */
+.banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ionity-space-5);
+  flex-wrap: wrap;
+  border-color: var(--ionity-purple);
+  background:
+    linear-gradient(135deg, rgba(87,70,227,0.16), rgba(0,212,184,0.10)),
+    var(--ionity-surface-1);
+}
+.banner h2 { margin: 0 0 4px; font-size: var(--ionity-text-md); }
+.banner .hint { margin: 0; max-width: 60ch; }
+.btn-link {
+  text-decoration: none;
+  display: inline-block;
+  white-space: nowrap;
+  padding: 11px 18px;
+}
+.banner-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ionity-space-2);
+}
 .panel-head {
   display: flex;
   align-items: center;
