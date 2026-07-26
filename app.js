@@ -59,6 +59,21 @@ const connRetestBtn = $("conn-retest");
 const connExplainBtn = $("conn-explain");
 let lastConn = null;
 
+// Organizer refs
+const orgStatus = $("org-status");
+const orgUnsupported = $("org-unsupported");
+const orgControls = $("org-controls");
+const orgApply = $("org-apply");
+const orgDupes = $("org-dupes");
+const orgDownloadsBtn = $("org-downloads");
+const orgDocumentsBtn = $("org-documents");
+const orgExplainBtn = $("org-explain");
+const orgDash = $("org-dash");
+const orgResults = $("org-results");
+const orgVerdict = $("org-verdict");
+const orgExplanation = $("org-explanation");
+let lastOrg = null;
+
 let installPromptEvent = null;
 let lastScan = null;
 
@@ -759,6 +774,214 @@ async function explainConnWithAi() {
   }
 }
 
+/* ------------------------------------------------------------------ */
+/* AI File Organizer (File System Access API — non-destructive)        */
+/* ------------------------------------------------------------------ */
+const FILE_CATEGORIES = [
+  { name: "Images",        rx: /\.(jpe?g|png|gif|webp|bmp|svg|heic|heif|tiff?|ico|avif)$/i },
+  { name: "Documents",     rx: /\.(pdf|docx?|txt|rtf|odt|pages|tex|wpd)$/i },
+  { name: "Spreadsheets",  rx: /\.(xlsx?|csv|ods|numbers|tsv)$/i },
+  { name: "Presentations", rx: /\.(pptx?|odp|key)$/i },
+  { name: "Video",         rx: /\.(mp4|mkv|mov|avi|wmv|webm|flv|m4v|mpe?g)$/i },
+  { name: "Audio",         rx: /\.(mp3|wav|flac|aac|ogg|m4a|wma|opus)$/i },
+  { name: "Archives",      rx: /\.(zip|rar|7z|tar|gz|bz2|xz|iso)$/i },
+  { name: "Installers",    rx: /\.(exe|msi|dmg|pkg|deb|rpm|appimage|apk)$/i },
+  { name: "Code",          rx: /\.(js|ts|jsx|tsx|py|java|c|cpp|cs|go|rs|rb|php|html?|css|json|xml|ya?ml|sh|ps1|sql)$/i },
+  { name: "Ebooks",        rx: /\.(epub|mobi|azw3?|fb2)$/i },
+  { name: "Fonts",         rx: /\.(ttf|otf|woff2?|eot)$/i },
+];
+const OTHER_CATEGORY = "Other";
+const CATEGORY_NAMES = [...FILE_CATEGORIES.map((c) => c.name), OTHER_CATEGORY];
+
+function categorize(name) {
+  for (const c of FILE_CATEGORIES) if (c.rx.test(name)) return c.name;
+  return OTHER_CATEGORY;
+}
+
+function orgSupported() { return typeof window.showDirectoryPicker === "function"; }
+
+async function sha256Hex(buffer) {
+  const digest = await crypto.subtle.digest("SHA-256", buffer);
+  return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+async function uniqueName(dirHandle, name) {
+  let candidate = name;
+  const dot = name.lastIndexOf(".");
+  const base = dot > 0 ? name.slice(0, dot) : name;
+  const ext = dot > 0 ? name.slice(dot) : "";
+  let i = 1;
+  // Loop until getFileHandle throws NotFound (name is free)
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    try { await dirHandle.getFileHandle(candidate); candidate = `${base} (${i++})${ext}`; }
+    catch { return candidate; }
+  }
+}
+
+async function moveFile(rootDir, subDir, name, fileHandle) {
+  const target = await uniqueName(subDir, name);
+  if (typeof fileHandle.move === "function") {
+    await fileHandle.move(subDir, target);
+    return target;
+  }
+  // Fallback: copy bytes then remove original (relocate — never data-loss)
+  const file = await fileHandle.getFile();
+  const dest = await subDir.getFileHandle(target, { create: true });
+  const writable = await dest.createWritable();
+  await writable.write(file);
+  await writable.close();
+  await rootDir.removeEntry(name);
+  return target;
+}
+
+function orgAdd(label, value, level = "") {
+  const li = document.createElement("li");
+  if (level) li.className = level;
+  li.innerHTML = `<strong>${label}:</strong> <span>${value}</span>`;
+  orgResults.appendChild(li);
+}
+
+async function organizeFolder(kind) {
+  if (!orgSupported()) return;
+  const apply = orgApply.checked;
+  const scanDupes = orgDupes.checked;
+
+  let rootDir;
+  try {
+    rootDir = await window.showDirectoryPicker({
+      id: "org-" + kind,
+      mode: apply ? "readwrite" : "read",
+      startIn: kind === "downloads" ? "downloads" : "documents",
+    });
+  } catch {
+    return; // user cancelled the picker
+  }
+
+  orgResults.innerHTML = "";
+  orgDash.hidden = true;
+  orgVerdict.hidden = true;
+  orgExplanation.hidden = true;
+  orgStatus.textContent = apply ? "organizing…" : "scanning…";
+  orgDownloadsBtn.disabled = orgDocumentsBtn.disabled = true;
+
+  const tally = {};       // category -> { count, bytes }
+  const hashes = new Map(); // hash -> [names]
+  let scanned = 0, moved = 0, skipped = 0;
+
+  try {
+    for await (const [name, handle] of rootDir.entries()) {
+      if (handle.kind !== "file") continue;
+      if (name.startsWith(".")) continue;
+      const cat = categorize(name);
+      let size = 0;
+      try { size = (await handle.getFile()).size; } catch { /* ignore */ }
+      tally[cat] = tally[cat] || { count: 0, bytes: 0 };
+      tally[cat].count += 1;
+      tally[cat].bytes += size;
+      scanned += 1;
+
+      if (scanDupes) {
+        try {
+          const buf = await (await handle.getFile()).arrayBuffer();
+          const h = await sha256Hex(buf);
+          if (!hashes.has(h)) hashes.set(h, []);
+          hashes.get(h).push(name);
+        } catch { /* ignore unreadable */ }
+      }
+
+      if (apply) {
+        try {
+          const sub = await rootDir.getDirectoryHandle(cat, { create: true });
+          await moveFile(rootDir, sub, name, handle);
+          moved += 1;
+        } catch { skipped += 1; }
+      }
+    }
+
+    // Dashboard
+    orgDash.hidden = false;
+    orgDash.innerHTML = "";
+    for (const cat of CATEGORY_NAMES) {
+      const t = tally[cat];
+      if (!t) continue;
+      const card = document.createElement("div");
+      card.className = "org-card";
+      card.innerHTML = `<div class="cat">${cat}</div><div class="meta">${t.count} file${t.count === 1 ? "" : "s"} · ${fmtBytes(t.bytes)}</div>`;
+      orgDash.appendChild(card);
+    }
+
+    // Results
+    orgAdd("Folder", rootDir.name);
+    orgAdd("Files scanned", String(scanned), scanned ? "ok" : "warn");
+    if (apply) {
+      orgAdd("Files moved into type folders", String(moved), moved ? "ok" : "");
+      if (skipped) orgAdd("Skipped (in use / locked)", String(skipped), "warn");
+    } else {
+      orgAdd("Mode", "Preview only — nothing was moved", "warn");
+    }
+
+    // Duplicates (flag only — never delete)
+    const dupeGroups = [...hashes.values()].filter((arr) => arr.length > 1);
+    const dupeFiles = dupeGroups.reduce((s, a) => s + (a.length - 1), 0);
+    if (scanDupes) {
+      orgAdd("Duplicate sets found", String(dupeGroups.length), dupeGroups.length ? "danger" : "ok");
+      for (const g of dupeGroups.slice(0, 8)) orgAdd("• Identical", g.join("  ·  "), "warn");
+    }
+
+    lastOrg = { folder: rootDir.name, kind, apply, scanned, moved, tally, dupeGroups: dupeGroups.length, dupeFiles };
+
+    // Verdict
+    orgVerdict.hidden = false;
+    orgVerdict.className = "link-verdict " + (apply ? "ok" : "auth");
+    orgVerdict.innerHTML = apply
+      ? `<strong>Done.</strong> Sorted <strong>${moved}</strong> file${moved === 1 ? "" : "s"} in <em>${rootDir.name}</em> into type folders — nothing deleted.` +
+        (dupeFiles ? ` Also flagged <strong>${dupeFiles}</strong> duplicate file${dupeFiles === 1 ? "" : "s"} you could remove to reclaim space.` : "")
+      : `<strong>Preview ready.</strong> Found <strong>${scanned}</strong> file${scanned === 1 ? "" : "s"} across <strong>${Object.keys(tally).length}</strong> categories in <em>${rootDir.name}</em>. ` +
+        `Tick <em>"Actually move files"</em> and run again to sort them (still no deletions).`;
+
+    orgStatus.textContent = "done";
+    orgExplainBtn.disabled = !(await ensureAiSession());
+  } catch (err) {
+    orgAdd("Organizer error", err instanceof Error ? err.message : String(err), "danger");
+    orgStatus.textContent = "error";
+  } finally {
+    orgDownloadsBtn.disabled = orgDocumentsBtn.disabled = false;
+  }
+}
+
+function ruleBasedOrgExplanation(o) {
+  if (!o) return "Organize a folder first.";
+  const top = Object.entries(o.tally).sort((a, b) => b[1].count - a[1].count).slice(0, 3)
+    .map(([k, v]) => `${k} (${v.count})`).join(", ");
+  const out = [];
+  out.push(`In "${o.folder}" your biggest groups are: ${top || "none"}.`);
+  if (o.dupeFiles) out.push(`You have ${o.dupeFiles} duplicate file(s) taking up space — safe to delete the extra copies since identical originals remain.`);
+  out.push(o.apply
+    ? "Files are now sorted into type folders. Tip: re-run monthly, or grab the desktop .exe to automate it in the background."
+    : "This was a preview. Enable 'Actually move files' to sort them — nothing gets deleted, only relocated.");
+  out.push("(On-device AI wasn't available, so this is the built-in recommendation.)");
+  return out.join("\n\n");
+}
+
+async function explainOrgWithAi() {
+  if (!lastOrg) return;
+  orgExplanation.hidden = false;
+  orgExplanation.textContent = "Thinking on-device…";
+  const ok = await ensureAiSession();
+  if (!ok) { orgExplanation.textContent = ruleBasedOrgExplanation(lastOrg); return; }
+  const cats = Object.entries(lastOrg.tally).map(([k, v]) => `${k}:${v.count}`).join(", ");
+  const prompt = `A user organized their "${lastOrg.folder}" folder. Category counts: ${cats}. Duplicate files: ${lastOrg.dupeFiles}. ` +
+    `Give short, friendly recommendations on how to keep it tidy, what to archive or delete (duplicates), and a good folder routine. Under 120 words.`;
+  try {
+    orgExplanation.textContent = await aiSession.prompt(prompt);
+  } catch (err) {
+    orgExplanation.textContent = ruleBasedOrgExplanation(lastOrg) +
+      `\n\n(On-device AI error: ${err instanceof Error ? err.message : String(err)})`;
+  }
+}
+
+
 
 
 /* ------------------------------------------------------------------ */
@@ -853,6 +1076,20 @@ linkCopyBtn.addEventListener("click", async () => {
 // Connectivity Doctor wiring
 connRetestBtn.addEventListener("click", runConnDoctor);
 connExplainBtn.addEventListener("click", explainConnWithAi);
+
+// Organizer wiring
+orgDownloadsBtn.addEventListener("click", () => organizeFolder("downloads"));
+orgDocumentsBtn.addEventListener("click", () => organizeFolder("documents"));
+orgExplainBtn.addEventListener("click", explainOrgWithAi);
+if (orgSupported()) { orgControls.hidden = false; } else { orgUnsupported.hidden = false; }
+
+// Tab navigation
+function activateTab(tab) {
+  document.querySelectorAll(".tab").forEach((b) => b.classList.toggle("active", b.dataset.tab === tab));
+  document.querySelectorAll("[data-group]").forEach((s) => s.classList.toggle("show", s.dataset.group === tab));
+}
+document.querySelectorAll(".tab").forEach((b) => b.addEventListener("click", () => activateTab(b.dataset.tab)));
+activateTab("clean");
 
 /* ------------------------------------------------------------------ */
 /* Boot                                                                */

@@ -1,4 +1,4 @@
-const CACHE_NAME = "cach-out-ionity-v4";
+const CACHE_NAME = "cach-out-ionity-v5";
 const OFFLINE_FILES = [
   "./",
   "./index.html",
@@ -6,6 +6,7 @@ const OFFLINE_FILES = [
   "./app.js",
   "./manifest.webmanifest",
   "./brand/variables.css",
+  "./brand/assets/ionity-logo.png",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
   "./icons/icon-maskable-512.png",

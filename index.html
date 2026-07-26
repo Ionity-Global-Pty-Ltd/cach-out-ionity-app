@@ -65,7 +65,13 @@
       </div>
     </section>
 
-    <section class="panel ai-panel">
+    <nav class="tabs" role="tablist">
+      <button class="tab active" data-tab="clean" type="button">🧹 Privacy Reset</button>
+      <button class="tab" data-tab="network" type="button">🔌 Cloud Shell</button>
+      <button class="tab" data-tab="organize" type="button">🗂️ File Organizer</button>
+    </nav>
+
+    <section class="panel ai-panel" data-group="network">
       <div class="panel-head">
         <h2>🔌 Connectivity Doctor <small style="font-weight:400;color:var(--ionity-text-muted)">· Azure Cloud Shell</small></h2>
         <span id="conn-status" class="badge">idle</span>
@@ -80,7 +86,7 @@
       <div id="conn-explanation" class="ai-explanation" hidden></div>
     </section>
 
-    <section class="panel">
+    <section class="panel" data-group="clean">
       <div class="panel-head">
         <h2>Deep clean</h2>
         <span id="storage-estimate" class="badge">storage: —</span>
@@ -129,7 +135,7 @@
       </p>
     </section>
 
-    <section class="panel ai-panel">
+    <section class="panel ai-panel" data-group="clean">
       <div class="panel-head">
         <h2>🤖 AI Privacy Advisor</h2>
         <span id="ai-status" class="badge">on-device: checking…</span>
@@ -152,7 +158,7 @@
       <div id="ai-explanation" class="ai-explanation" hidden></div>
     </section>
 
-    <section class="panel ai-panel">
+    <section class="panel ai-panel" data-group="clean">
       <div class="panel-head">
         <h2>🔗 AI Smart Link Cleaner</h2>
         <span class="badge">tracker vs login-safe</span>
@@ -176,7 +182,7 @@
       <div id="link-explanation" class="ai-explanation" hidden></div>
     </section>
 
-    <section class="panel">
+    <section class="panel" data-group="clean">
       <h2>🌐 DNS flush &amp; OS-level reset</h2>
       <p class="hint">Browsers can't flush the operating-system DNS cache from JavaScript. Copy the command for your platform and run it in a terminal, or open the browser's internal DNS page.</p>
       <div class="cmd-list" id="cmd-list"></div>
@@ -188,10 +194,46 @@
       <p class="hint" id="open-note"></p>
     </section>
 
-    <section class="panel">
+    <section class="panel" data-group="clean">
       <h2>Last run log</h2>
       <p id="last-run">Not run yet.</p>
       <ul id="result-list" class="result-list" aria-live="polite"></ul>
+    </section>
+
+    <section class="panel organizer" data-group="organize">
+      <div class="panel-head">
+        <h2>🗂️ AI File Organizer</h2>
+        <span id="org-status" class="badge">ready</span>
+      </div>
+      <div class="org-intro">
+        <img src="./brand/assets/ionity-logo.png" alt="IONITY" class="org-logo" width="120" loading="lazy">
+        <p class="hint">Tidies your <strong>Downloads</strong> and <strong>Documents</strong> folders by moving files into type folders (Images, Documents, Video, Audio, Archives, Installers…). It <strong>never deletes</strong> anything — it only relocates, and duplicates are just flagged. Everything runs on your device; no file ever leaves your computer.</p>
+      </div>
+
+      <div id="org-unsupported" class="link-verdict warn" hidden>
+        Your browser can't grant folder access (needs Chrome or Edge on desktop). Use the <strong>downloadable .exe</strong> at the top for full folder organizing, or open this page in Chrome/Edge.
+      </div>
+
+      <div id="org-controls" hidden>
+        <label class="toggle" style="margin:8px 0">
+          <input id="org-apply" type="checkbox">
+          <span>Actually move files (off = safe preview only)</span>
+        </label>
+        <label class="toggle" style="margin:0 0 12px">
+          <input id="org-dupes" type="checkbox" checked>
+          <span>Scan for duplicate files (content hash — flags only, never deletes)</span>
+        </label>
+        <div class="button-row">
+          <button id="org-downloads" class="primary" type="button">📥 Organize Downloads</button>
+          <button id="org-documents" class="primary" type="button">📄 Organize Documents</button>
+          <button id="org-explain" class="secondary" type="button" disabled>AI recommendations</button>
+        </div>
+      </div>
+
+      <div id="org-dash" class="org-dash" hidden></div>
+      <ul id="org-results" class="result-list" aria-live="polite"></ul>
+      <div id="org-verdict" class="link-verdict" hidden></div>
+      <div id="org-explanation" class="ai-explanation" hidden></div>
     </section>
 
     <footer class="foot">

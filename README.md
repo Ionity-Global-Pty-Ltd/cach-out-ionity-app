@@ -26,6 +26,16 @@ Download the desktop app: **[CACH-OUT-Ionity.exe](https://github.com/Ionity-Glob
 
 ## Features
 
+The web app is organised into **tabs**:
+
+**🧹 Privacy Reset** — deep clean of this site's cookies/storage/caches/service workers, an on-device **AI Privacy Advisor** (privacy score + tracker detection), the **AI Smart Link Cleaner** (paste any URL — it labels each string as a *tracker to strip* or a *login token to keep*, and outputs a clean shareable link), and DNS/OS reset commands.
+
+**🔌 Cloud Shell** — an automated **Connectivity Doctor** that runs on load and tests whether Azure Cloud Shell's endpoints and its **WebSocket terminal** are reachable from your network, pinpointing the proxy/SSL-inspection block behind *"failed to request a terminal"* and giving the exact fix.
+
+**🗂️ AI File Organizer** — using the browser's File System Access API (Chrome/Edge desktop), it sorts your **Downloads** and **Documents** folders into type folders (Images, Documents, Video, Audio, Archives, Installers…), flags **duplicate files** by content hash, shows a size-per-category dashboard, and gives AI tidy-up recommendations. It **never deletes** anything — it only relocates, and always offers a safe preview first.
+
+## Deep clean details
+
 **Deep clean (selectable):**
 - Cookies for the current site domain/path scope
 - LocalStorage, SessionStorage and `window.name`
