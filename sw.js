@@ -1,4 +1,4 @@
-const CACHE_NAME = "cach-out-ionity-v5";
+const CACHE_NAME = "cach-out-ionity-v6";
 const OFFLINE_FILES = [
   "./",
   "./index.html",
@@ -18,8 +18,13 @@ self.addEventListener("install", (event) => {
   event.waitUntil((async () => {
     const cache = await caches.open(CACHE_NAME);
     await cache.addAll(OFFLINE_FILES);
-    await self.skipWaiting();
+    // Do NOT skipWaiting here — wait until the user clicks the Update button.
   })());
+});
+
+// The page posts this when the user clicks "Update available".
+self.addEventListener("message", (event) => {
+  if (event.data && event.data.type === "SKIP_WAITING") self.skipWaiting();
 });
 
 self.addEventListener("activate", (event) => {

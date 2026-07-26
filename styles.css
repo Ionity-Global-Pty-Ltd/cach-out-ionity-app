@@ -312,6 +312,24 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 [data-group] { display: none; }
 [data-group].show { display: block; }
 
+/* Update pill */
+.update-pill {
+  display: inline-block;
+  margin-top: var(--ionity-space-3);
+  background: var(--ionity-gradient-brand);
+  color: #fff;
+  border: none;
+  border-radius: var(--ionity-radius-full);
+  padding: 8px 16px;
+  font-weight: var(--ionity-weight-semibold);
+  box-shadow: var(--ionity-shadow-glow-purple);
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+@keyframes pulseGlow {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.15); }
+}
+
 /* Organizer */
 .org-intro { display: flex; align-items: center; gap: var(--ionity-space-5); flex-wrap: wrap; }
 .org-intro .hint { margin: 0; flex: 1 1 320px; }

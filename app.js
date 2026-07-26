@@ -1101,7 +1101,46 @@ detectAi();
 runConnDoctor(); // automatic on load
 
 if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js").catch(() => { /* offline cache optional */ });
+  const updateBtn = $("app-update");
+  let refreshing = false;
+
+  // When the new SW takes control, reload once to load fresh assets.
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (refreshing) return;
+    refreshing = true;
+    window.location.reload();
+  });
+
+  const showUpdate = (worker) => {
+    if (!updateBtn || !worker) return;
+    updateBtn.hidden = false;
+    updateBtn.onclick = () => {
+      updateBtn.textContent = "Updating…";
+      worker.postMessage({ type: "SKIP_WAITING" });
+    };
+  };
+
+  window.addEventListener("load", async () => {
+    try {
+      const reg = await navigator.serviceWorker.register("./sw.js");
+
+      // An update is already waiting from a previous visit.
+      if (reg.waiting && navigator.serviceWorker.controller) showUpdate(reg.waiting);
+
+      // A new version is being installed right now.
+      reg.addEventListener("updatefound", () => {
+        const nw = reg.installing;
+        if (!nw) return;
+        nw.addEventListener("statechange", () => {
+          if (nw.state === "installed" && navigator.serviceWorker.controller) showUpdate(nw);
+        });
+      });
+
+      // Automatic update checks: every 60s and whenever the tab regains focus.
+      setInterval(() => reg.update().catch(() => {}), 60000);
+      document.addEventListener("visibilitychange", () => {
+        if (!document.hidden) reg.update().catch(() => {});
+      });
+    } catch { /* offline cache optional */ }
   });
 }
