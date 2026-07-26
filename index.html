@@ -65,6 +65,21 @@
       </div>
     </section>
 
+    <section class="panel ai-panel">
+      <div class="panel-head">
+        <h2>🔌 Connectivity Doctor <small style="font-weight:400;color:var(--ionity-text-muted)">· Azure Cloud Shell</small></h2>
+        <span id="conn-status" class="badge">idle</span>
+      </div>
+      <p class="hint">Runs <strong>automatically</strong>. Tests whether Azure Cloud Shell can reach its servers and open its <strong>WebSocket terminal</strong> from this network — the exact thing that fails with <em>"failed to request a terminal."</em> Detects proxy / SSL-inspection blocking. Nothing is uploaded.</p>
+      <div class="button-row">
+        <button id="conn-retest" class="primary" type="button">Re-run tests</button>
+        <button id="conn-explain" class="secondary" type="button" disabled>Explain &amp; fix with AI</button>
+      </div>
+      <ul id="conn-results" class="result-list" aria-live="polite"></ul>
+      <div id="conn-verdict" class="link-verdict" hidden></div>
+      <div id="conn-explanation" class="ai-explanation" hidden></div>
+    </section>
+
     <section class="panel">
       <div class="panel-head">
         <h2>Deep clean</h2>
@@ -135,6 +150,30 @@
 
       <ul id="ai-findings" class="result-list" aria-live="polite"></ul>
       <div id="ai-explanation" class="ai-explanation" hidden></div>
+    </section>
+
+    <section class="panel ai-panel">
+      <div class="panel-head">
+        <h2>🔗 AI Smart Link Cleaner</h2>
+        <span class="badge">tracker vs login-safe</span>
+      </div>
+      <p class="hint">Paste <em>any</em> link — even a sign-in / OAuth URL like the ones that never seem to clean up. The advisor sorts every string into <strong>trackers</strong> you can safely strip and <strong>login tokens</strong> you must keep (removing those breaks the login), then hands you a clean, shareable version. Runs 100% locally.</p>
+      <textarea id="link-input" class="link-input" rows="3" spellcheck="false" placeholder="https://example.com/page?utm_source=news&gclid=abc123&id=42"></textarea>
+      <div class="button-row">
+        <button id="link-analyze" class="primary" type="button">Analyse link</button>
+        <button id="link-paste" class="ghost" type="button">Paste from clipboard</button>
+        <button id="link-explain" class="secondary" type="button" disabled>Explain with AI</button>
+      </div>
+      <div id="link-verdict" class="link-verdict" hidden></div>
+      <ul id="link-params" class="result-list" aria-live="polite"></ul>
+      <div id="link-clean-wrap" class="link-clean" hidden>
+        <p class="hint" style="margin-top:0">Cleaned link — trackers removed, everything the page needs kept:</p>
+        <div class="cmd">
+          <code id="link-clean"></code>
+          <button id="link-copy" class="copy-btn" type="button">Copy</button>
+        </div>
+      </div>
+      <div id="link-explanation" class="ai-explanation" hidden></div>
     </section>
 
     <section class="panel">

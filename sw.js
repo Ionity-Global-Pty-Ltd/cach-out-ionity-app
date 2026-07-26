@@ -1,4 +1,4 @@
-const CACHE_NAME = "cach-out-ionity-v3";
+const CACHE_NAME = "cach-out-ionity-v4";
 const OFFLINE_FILES = [
   "./",
   "./index.html",
