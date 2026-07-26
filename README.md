@@ -22,7 +22,7 @@ use the extension above.
 | **Browser extension** ([`extension/`](./extension)) | Cache, cookies, storage, IndexedDB, service workers across **all** sites | Cross-site browser cleanup |
 | **Web PWA** (this site) | This site's own data only + on-device AI advisor | Quick per-site reset |
 
-Download the desktop app: [`cach-out-ionity-desktop.zip`](./cach-out-ionity-desktop.zip) — unzip and run `CACH-OUT-Ionity.bat`.
+Download the desktop app: **[CACH-OUT-Ionity.exe](https://github.com/Ionity-Global-Pty-Ltd/cach-out-ionity-app/releases/latest/download/CACH-OUT-Ionity.exe)** — double-click, approve the admin prompt, done. (Script version: [`cach-out-ionity-desktop.zip`](./cach-out-ionity-desktop.zip).)
 
 ## Features
 

@@ -6,13 +6,19 @@ Winsock/ARP and renew your IP — all from one branded window.
 
 ## Run it
 
-1. Download this `desktop/` folder (or `cach-out-ionity-desktop.zip` and unzip it).
-2. Double-click **`CACH-OUT-Ionity.bat`**.
-3. Approve the Administrator prompt (needed for DNS / Winsock / renew IP).
-4. Tick what you want, then click **⚡ CACH OUT NOW**.
+**Easiest — download the installer-free `.exe`:**
 
-No installation, no dependencies — it's a signed-by-you PowerShell GUI that runs on any
+➡ **[Download CACH-OUT-Ionity.exe](https://github.com/Ionity-Global-Pty-Ltd/cach-out-ionity-app/releases/latest/download/CACH-OUT-Ionity.exe)**
+
+1. Double-click **`CACH-OUT-Ionity.exe`**.
+2. Approve the Administrator (UAC) prompt.
+3. Tick what you want, then click **⚡ CACH OUT NOW**.
+
+No installation, no dependencies — one self-contained executable that runs on any
 Windows 10/11 machine.
+
+> **Prefer scripts?** You can also run `CACH-OUT-Ionity.bat` (self-elevates and runs the
+> PowerShell version) instead of the `.exe`.
 
 ## What it can clean
 
