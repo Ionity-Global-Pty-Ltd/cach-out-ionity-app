@@ -257,6 +257,12 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   color: var(--ionity-text-dim);
   font-size: var(--ionity-text-xs);
 }
+.foot a {
+  color: var(--ionity-teal-text, var(--ionity-teal));
+  text-decoration: none;
+  font-weight: var(--ionity-weight-semibold);
+}
+.foot a:hover { text-decoration: underline; }
 
 @media (max-width: 640px) {
   .app-shell { width: 94vw; padding-top: var(--ionity-space-5); }
