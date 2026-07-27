@@ -24,6 +24,8 @@ use the extension above.
 
 Download the desktop app: **[CACH-OUT-Ionity.exe](https://github.com/Ionity-Global-Pty-Ltd/cach-out-ionity-app/releases/latest/download/CACH-OUT-Ionity.exe)** — double-click, approve the admin prompt, done. (Script version: [`cach-out-ionity-desktop.zip`](./cach-out-ionity-desktop.zip).)
 
+Desktop release note: the `.exe` is now produced from `desktop-native/` (native WinForms build) rather than script-packaging to reduce antivirus false-positive rates.
+
 ## Features
 
 The web app is organised into **tabs**:

@@ -1,2 +1,6 @@
 desktop/CACH-OUT-Ionity.exe
 desktop/app.ico
+desktop/publish/
+desktop-native/bin/
+desktop-native/obj/
+desktop-native/*.user

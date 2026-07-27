@@ -1,4 +1,4 @@
-# CACH OUT Ionity — Desktop mini-app (Windows)
+# CACH OUT Ionity — Desktop app (Windows)
 
 A no-install cleaner that does the **OS-level** things a web page or extension can't:
 flush DNS, wipe every browser's cache/cookies, clear temp + thumbnail caches, reset
@@ -14,11 +14,25 @@ Winsock/ARP and renew your IP — all from one branded window.
 2. Approve the Administrator (UAC) prompt.
 3. Tick what you want, then click **⚡ CACH OUT NOW**.
 
-No installation, no dependencies — one self-contained executable that runs on any
-Windows 10/11 machine.
+No installation, no dependencies — one self-contained executable that runs on Windows 10/11.
 
-> **Prefer scripts?** You can also run `CACH-OUT-Ionity.bat` (self-elevates and runs the
-> PowerShell version) instead of the `.exe`.
+> **Build note:** the `.exe` is now built from `desktop-native/` as a native .NET WinForms app
+> (not script-packed). This significantly reduces antivirus false-positive risk versus
+> script-to-exe wrappers.
+
+## Build from source
+
+```powershell
+pwsh ./desktop/build-native.ps1
+```
+
+Output lands in `desktop/publish/win-x64/`.
+
+## Why some systems may still warn
+
+- Unsigned executables from new projects can still trigger **reputation-based** warnings.
+- To fully remove publisher/reputation warnings across most machines, ship releases signed with
+  an **OV/EV code-signing certificate** and submit false positives to Defender/SmartScreen vendors.
 
 ## What it can clean
 
