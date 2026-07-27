@@ -1,0 +1,30 @@
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.defaultLocale.1.6.0.schema.json
+PackageIdentifier: IonityGlobal.CachOut
+PackageVersion: 2.0.0
+PackageLocale: en-US
+Publisher: Ionity Global (Pty) Ltd
+PublisherUrl: https://www.ionity.co.za
+PublisherSupportUrl: https://github.com/Ionity-Global-Pty-Ltd/cach-out-ionity-app/issues
+PackageName: CACH OUT Ionity
+PackageUrl: https://ionity-global-pty-ltd.github.io/cach-out-ionity-app/
+License: Proprietary
+Copyright: Copyright (c) Ionity Global (Pty) Ltd
+ShortDescription: One-click privacy, cache, DNS, SSL/certificate and network reset for Windows.
+Description: >-
+  CACH OUT Ionity is a compiled, digitally signed Windows utility that resets
+  your privacy and network state in one click. It flushes DNS/ARP/NetBIOS/Winsock,
+  clears every browser's cache and cookies, wipes temp/thumbnail/prefetch/font
+  and Windows Update caches, clears SSL and certificate URL caches, can refresh
+  trusted root certificates from Windows Update, and optionally blocks known
+  trackers via a reversible, backed-up hosts entry.
+Moniker: cach-out-ionity
+Tags:
+  - cache
+  - cleaner
+  - dns
+  - privacy
+  - network
+  - ssl
+  - certificates
+ManifestType: defaultLocale
+ManifestVersion: 1.6.0

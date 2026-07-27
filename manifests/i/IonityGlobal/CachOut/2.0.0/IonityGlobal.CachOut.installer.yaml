@@ -1,0 +1,12 @@
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.installer.1.6.0.schema.json
+PackageIdentifier: IonityGlobal.CachOut
+PackageVersion: 2.0.0
+InstallerType: portable
+Commands:
+  - cach-out-ionity
+Installers:
+  - Architecture: x64
+    InstallerUrl: https://github.com/Ionity-Global-Pty-Ltd/cach-out-ionity-app/releases/download/v2.0.0/CACH-OUT-Ionity.exe
+    InstallerSha256: 2348445300FBFA2841EE79920793387D3F5FAC627EFDF5CCD96125C92B72361E
+ManifestType: installer
+ManifestVersion: 1.6.0
