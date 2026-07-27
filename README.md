@@ -18,13 +18,13 @@ use the extension above.
 
 | | Clears | Best for |
 | --- | --- | --- |
-| **Windows desktop app** ([`desktop/`](./desktop)) | DNS cache, every browser's cache/cookies, temp + thumbnail cache, Winsock/ARP, IP renew | Full OS-level reset |
+| **Windows desktop app** ([`desktop-net/`](./desktop-net)) | DNS/ARP/NetBIOS/Winsock, every browser's cache/cookies, temp/thumbnail/prefetch/font/Windows-Update caches, SSL & certificate cache, trusted-root refresh, optional reversible tracker blocking | Full OS-level reset |
 | **Browser extension** ([`extension/`](./extension)) | Cache, cookies, storage, IndexedDB, service workers across **all** sites | Cross-site browser cleanup |
 | **Web PWA** (this site) | This site's own data only + on-device AI advisor | Quick per-site reset |
 
-Download the desktop app: **[CACH-OUT-Ionity.exe](https://github.com/Ionity-Global-Pty-Ltd/cach-out-ionity-app/releases/latest/download/CACH-OUT-Ionity.exe)** — double-click, approve the admin prompt, done. (Script version: [`cach-out-ionity-desktop.zip`](./cach-out-ionity-desktop.zip).)
+Download the desktop app: **[CACH-OUT-Ionity.exe](https://github.com/Ionity-Global-Pty-Ltd/cach-out-ionity-app/releases/latest/download/CACH-OUT-Ionity.exe)** — double-click, approve the admin prompt, done.
 
-Desktop release note: the `.exe` is now produced from `desktop-native/` (native WinForms build) rather than script-packaging to reduce antivirus false-positive rates.
+Desktop release note (v2.0.0): the `.exe` is now a **real compiled .NET 10 / C# WinForms application** (source in [`desktop-net/`](./desktop-net)), self-contained (no .NET install needed) and **digitally signed** by *Ionity Global (Pty) Ltd* with a SHA-256 timestamp. This replaces the earlier PowerShell-packaged build, which was the main cause of antivirus false positives. Each release ships a `SHA256SUMS.txt` checksum and a publisher certificate (`IonityGlobal-CodeSigning.cer` + `Trust-Publisher.ps1`) so you can verify and trust the publisher.
 
 ## Features
 
