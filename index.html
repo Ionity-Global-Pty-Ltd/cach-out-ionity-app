@@ -70,6 +70,7 @@
       <button class="tab active" data-tab="clean" type="button">🧹 Privacy Reset</button>
       <button class="tab" data-tab="network" type="button">🔌 Cloud Shell</button>
       <button class="tab" data-tab="organize" type="button">🗂️ File Organizer</button>
+      <button class="tab" data-tab="report" type="button">📋 Report Log</button>
     </nav>
 
     <section class="panel ai-panel" data-group="network">
@@ -235,6 +236,26 @@
       <ul id="org-results" class="result-list" aria-live="polite"></ul>
       <div id="org-verdict" class="link-verdict" hidden></div>
       <div id="org-explanation" class="ai-explanation" hidden></div>
+    </section>
+
+    <section class="panel report" data-group="report">
+      <div class="panel-head">
+        <img src="./brand/assets/ionity-logo.png" alt="IONITY" class="report-logo" width="110" loading="lazy">
+        <span id="report-count-badge" class="badge">0 runs</span>
+      </div>
+      <h2>📋 Activity Report</h2>
+      <p class="hint">A running record of everything CACH OUT has done on this device — how much storage was reclaimed, cookies and site data cleared, URLs sanitised and folders organised. Stored only on your device and <strong>kept safe even when you Deep Clean</strong>. Nothing is ever uploaded.</p>
+
+      <div id="report-totals" class="report-totals" aria-live="polite"></div>
+
+      <div class="button-row">
+        <button id="report-download" class="primary" type="button">⬇ Download report (.txt)</button>
+        <button id="report-download-json" class="secondary" type="button">⧉ Export JSON</button>
+        <button id="report-clear" class="ghost" type="button">🗑 Clear log</button>
+      </div>
+
+      <ul id="report-list" class="report-list" aria-live="polite"></ul>
+      <p class="hint" id="report-empty" hidden>No activity recorded yet. Run a Deep Clean or organise a folder and it'll show up here.</p>
     </section>
 
     <footer class="foot">

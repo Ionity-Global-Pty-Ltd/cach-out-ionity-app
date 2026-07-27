@@ -116,6 +116,122 @@ function addResult(label, value, level = "") {
 }
 function resetResults() { resultList.innerHTML = ""; }
 function stampLastRun() { lastRun.textContent = `Completed at ${new Date().toLocaleString()}`; }
+
+/* ------------------------------------------------------------------ */
+/* Report Log (persistent, on-device, survives Deep Clean)             */
+/* ------------------------------------------------------------------ */
+const REPORT_KEY = "cachout.reportlog.v1";
+const REPORT_MAX = 200;
+
+function loadReport() {
+  try {
+    const raw = window.localStorage.getItem(REPORT_KEY);
+    const arr = raw ? JSON.parse(raw) : [];
+    return Array.isArray(arr) ? arr : [];
+  } catch { return []; }
+}
+function saveReport(entries) {
+  try { window.localStorage.setItem(REPORT_KEY, JSON.stringify(entries.slice(0, REPORT_MAX))); }
+  catch { /* storage full or blocked — ignore */ }
+}
+/* Record one run. entry: { type, icon, title, bytes, items:[{label,value}] } */
+function logRun(entry) {
+  const entries = loadReport();
+  entries.unshift({
+    ts: Date.now(),
+    type: entry.type || "run",
+    icon: entry.icon || "•",
+    title: entry.title || "Activity",
+    bytes: Number(entry.bytes) || 0,
+    items: Array.isArray(entry.items) ? entry.items.filter((i) => i && i.label) : [],
+  });
+  saveReport(entries);
+  renderReport();
+}
+function reportTotals(entries) {
+  const t = { runs: entries.length, bytes: 0, cookies: 0, storage: 0, urls: 0, files: 0 };
+  for (const e of entries) {
+    t.bytes += Number(e.bytes) || 0;
+    for (const it of e.items || []) {
+      const n = parseInt(String(it.value).replace(/[^\d]/g, ""), 10) || 0;
+      const l = String(it.label).toLowerCase();
+      if (l.includes("cookie")) t.cookies += n;
+      else if (l.includes("storage") || l.includes("indexeddb") || l.includes("cache")) t.storage += n;
+      else if (l.includes("url") || l.includes("tracker") || l.includes("string")) t.urls += n;
+      else if (l.includes("file") || l.includes("organi")) t.files += n;
+    }
+  }
+  return t;
+}
+function renderReport() {
+  const list = $("report-list");
+  const totalsBox = $("report-totals");
+  const emptyNote = $("report-empty");
+  const badge = $("report-count-badge");
+  if (!list || !totalsBox) return;
+  const entries = loadReport();
+  const t = reportTotals(entries);
+
+  if (badge) badge.textContent = `${t.runs} run${t.runs === 1 ? "" : "s"}`;
+  totalsBox.innerHTML = [
+    { k: "Storage reclaimed", v: fmtBytes(t.bytes), hot: t.bytes > 0 },
+    { k: "Runs recorded", v: String(t.runs) },
+    { k: "Cookies cleared", v: String(t.cookies) },
+    { k: "Site-data buckets", v: String(t.storage) },
+    { k: "URL strings removed", v: String(t.urls) },
+    { k: "Files organised", v: String(t.files) },
+  ].map((c) => `<div class="report-stat${c.hot ? " hot" : ""}"><span class="rv">${c.v}</span><span class="rk">${c.k}</span></div>`).join("");
+
+  if (emptyNote) emptyNote.hidden = entries.length > 0;
+  list.innerHTML = entries.map((e) => {
+    const when = new Date(e.ts).toLocaleString();
+    const detail = (e.items || []).map((i) => `<li><span>${i.label}</span><strong>${i.value}</strong></li>`).join("");
+    const gb = e.bytes ? `<span class="report-gb">${fmtBytes(e.bytes)} freed</span>` : "";
+    return `<li class="report-entry">
+      <div class="report-entry-head">
+        <span class="report-icon">${e.icon}</span>
+        <div class="report-title">${e.title}</div>
+        ${gb}
+        <time>${when}</time>
+      </div>
+      ${detail ? `<ul class="report-detail">${detail}</ul>` : ""}
+    </li>`;
+  }).join("");
+}
+function reportToText(entries) {
+  const t = reportTotals(entries);
+  const lines = [];
+  lines.push("CACH OUT Ionity — Activity Report");
+  lines.push("Ionity Global (Pty) Ltd · www.ionity.co.za");
+  lines.push(`Generated: ${new Date().toLocaleString()}`);
+  lines.push("".padEnd(52, "="));
+  lines.push("LIFETIME TOTALS");
+  lines.push(`  Storage reclaimed : ${fmtBytes(t.bytes)}`);
+  lines.push(`  Runs recorded     : ${t.runs}`);
+  lines.push(`  Cookies cleared   : ${t.cookies}`);
+  lines.push(`  Site-data buckets : ${t.storage}`);
+  lines.push(`  URL strings removed: ${t.urls}`);
+  lines.push(`  Files organised   : ${t.files}`);
+  lines.push("".padEnd(52, "="));
+  lines.push("HISTORY (newest first)");
+  if (!entries.length) lines.push("  (nothing recorded yet)");
+  for (const e of entries) {
+    lines.push("");
+    lines.push(`[${new Date(e.ts).toLocaleString()}] ${e.icon} ${e.title}${e.bytes ? ` — ${fmtBytes(e.bytes)} freed` : ""}`);
+    for (const i of e.items || []) lines.push(`    • ${i.label}: ${i.value}`);
+  }
+  lines.push("");
+  return lines.join("\n");
+}
+function downloadBlob(filename, text, type) {
+  const blob = new Blob([text], { type: type || "text/plain" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
 function setBusy(busy) {
   deepCleanButton.disabled = busy;
   sanitizeButton.disabled = busy;
@@ -178,10 +294,16 @@ function clearCookieJar() {
 function clearWebStorage() {
   const local = window.localStorage.length;
   const session = window.sessionStorage.length;
+  // Preserve our own on-device report log across the wipe.
+  let savedLog = null;
+  try { savedLog = window.localStorage.getItem(REPORT_KEY); } catch { /* ignore */ }
   window.localStorage.clear();
   window.sessionStorage.clear();
+  try { if (savedLog !== null) window.localStorage.setItem(REPORT_KEY, savedLog); } catch { /* ignore */ }
   try { window.name = ""; } catch { /* ignore */ }
-  return { local, session };
+  // Don't count our own preserved key as "user data still present".
+  const preserved = savedLog !== null ? 1 : 0;
+  return { local: Math.max(0, local - preserved), session };
 }
 
 async function clearCacheStorage() {
@@ -240,39 +362,52 @@ async function runDeepClean() {
   setBusy(true);
   aiExplanation.hidden = true;
   const before = await readEstimate();
+  const logItems = [];
+  let reclaimedBytes = 0;
   try {
     if (opt.cookies.checked) {
       const r = clearCookieJar();
       addResult("Cookies detected", String(r.detected), r.detected ? "warn" : "ok");
       addResult("Cookie delete attempts", String(r.attempts));
+      logItems.push({ label: "Cookies cleared", value: String(r.detected) });
     }
     if (opt.storage.checked) {
       const r = clearWebStorage();
       addResult("LocalStorage cleared", String(r.local), r.local ? "warn" : "ok");
       addResult("SessionStorage cleared", String(r.session));
+      logItems.push({ label: "LocalStorage keys cleared", value: String(r.local) });
+      logItems.push({ label: "SessionStorage keys cleared", value: String(r.session) });
     }
     const jobs = [];
-    if (opt.caches.checked) jobs.push(clearCacheStorage().then((r) =>
-      addResult("CacheStorage buckets deleted", r.supported ? String(r.deleted) : "unsupported")));
-    if (opt.idb.checked) jobs.push(clearIndexedDatabases().then((r) =>
-      addResult("IndexedDB databases deleted", r.supported ? String(r.deleted) : "unsupported")));
-    if (opt.sw.checked) jobs.push(unregisterServiceWorkers().then((r) =>
-      addResult("Service workers unregistered", r.supported ? String(r.removed) : "unsupported")));
+    if (opt.caches.checked) jobs.push(clearCacheStorage().then((r) => {
+      addResult("CacheStorage buckets deleted", r.supported ? String(r.deleted) : "unsupported");
+      if (r.supported) logItems.push({ label: "CacheStorage buckets deleted", value: String(r.deleted) });
+    }));
+    if (opt.idb.checked) jobs.push(clearIndexedDatabases().then((r) => {
+      addResult("IndexedDB databases deleted", r.supported ? String(r.deleted) : "unsupported");
+      if (r.supported) logItems.push({ label: "IndexedDB databases deleted", value: String(r.deleted) });
+    }));
+    if (opt.sw.checked) jobs.push(unregisterServiceWorkers().then((r) => {
+      addResult("Service workers unregistered", r.supported ? String(r.removed) : "unsupported");
+      if (r.supported) logItems.push({ label: "Service workers unregistered", value: String(r.removed) });
+    }));
     await Promise.all(jobs);
 
     if (opt.url.checked) {
       const r = sanitizeUrl({ removeAll: true });
       addResult("URL strings removed", String(r.removed));
       addResult("Sanitized URL", r.url);
+      logItems.push({ label: "URL strings removed", value: String(r.removed) });
     }
 
     const after = await refreshEstimateBadge();
     if (before && after) {
-      const reclaimed = Math.max(0, (before.usage || 0) - (after.usage || 0));
-      addResult("Storage reclaimed", fmtBytes(reclaimed), reclaimed ? "ok" : "");
+      reclaimedBytes = Math.max(0, (before.usage || 0) - (after.usage || 0));
+      addResult("Storage reclaimed", fmtBytes(reclaimedBytes), reclaimedBytes ? "ok" : "");
     }
 
     stampLastRun();
+    logRun({ type: "clean", icon: "🧹", title: "Deep Clean", bytes: reclaimedBytes, items: logItems });
 
     if (opt.reload.checked) {
       addResult("Reloading", "bypassing HTTP cache…");
@@ -931,6 +1066,21 @@ async function organizeFolder(kind) {
 
     lastOrg = { folder: rootDir.name, kind, apply, scanned, moved, tally, dupeGroups: dupeGroups.length, dupeFiles };
 
+    const orgBytes = Object.values(tally).reduce((s, t) => s + (t.bytes || 0), 0);
+    logRun({
+      type: "organize",
+      icon: "🗂️",
+      title: `Organised ${kind === "downloads" ? "Downloads" : "Documents"} (${rootDir.name})`,
+      bytes: 0,
+      items: [
+        { label: "Files scanned", value: String(scanned) },
+        { label: apply ? "Files moved into type folders" : "Mode", value: apply ? String(moved) : "Preview only" },
+        { label: "Categories", value: String(Object.keys(tally).length) },
+        { label: "Total size seen", value: fmtBytes(orgBytes) },
+        { label: "Duplicate sets flagged", value: String(dupeGroups.length) },
+      ],
+    });
+
     // Verdict
     orgVerdict.hidden = false;
     orgVerdict.className = "link-verdict " + (apply ? "ok" : "auth");
@@ -1053,6 +1203,8 @@ sanitizeButton.addEventListener("click", () => {
   addResult("URL strings removed", String(r.removed));
   addResult("Sanitized URL", r.url);
   stampLastRun();
+  logRun({ type: "sanitize", icon: "🔗", title: "URL sanitised", bytes: 0,
+    items: [{ label: "URL strings removed", value: String(r.removed) }] });
 });
 hardReloadButton.addEventListener("click", hardReload);
 aiScanButton.addEventListener("click", runScan);
@@ -1082,6 +1234,22 @@ orgDownloadsBtn.addEventListener("click", () => organizeFolder("downloads"));
 orgDocumentsBtn.addEventListener("click", () => organizeFolder("documents"));
 orgExplainBtn.addEventListener("click", explainOrgWithAi);
 if (orgSupported()) { orgControls.hidden = false; } else { orgUnsupported.hidden = false; }
+
+// Report Log wiring
+$("report-download")?.addEventListener("click", () => {
+  const stamp = new Date().toISOString().slice(0, 10);
+  downloadBlob(`cach-out-report-${stamp}.txt`, reportToText(loadReport()), "text/plain");
+});
+$("report-download-json")?.addEventListener("click", () => {
+  const stamp = new Date().toISOString().slice(0, 10);
+  downloadBlob(`cach-out-report-${stamp}.json`, JSON.stringify(loadReport(), null, 2), "application/json");
+});
+$("report-clear")?.addEventListener("click", () => {
+  if (!confirm("Clear the entire activity report? This can't be undone.")) return;
+  saveReport([]);
+  renderReport();
+});
+renderReport();
 
 // Tab navigation
 function activateTab(tab) {
