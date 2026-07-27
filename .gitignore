@@ -4,3 +4,7 @@ desktop/publish/
 desktop-native/bin/
 desktop-native/obj/
 desktop-native/*.user
+desktop-net/bin/
+desktop-net/obj/
+desktop-net/*.user
+*.pfx
