@@ -135,6 +135,10 @@ function saveReport(entries) {
   catch { /* storage full or blocked — ignore */ }
 }
 /* Record one run. entry: { type, icon, title, bytes, items:[{label,value}] } */
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, (c) =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
 function logRun(entry) {
   const entries = loadReport();
   entries.unshift({
@@ -158,7 +162,7 @@ function reportTotals(entries) {
       if (l.includes("cookie")) t.cookies += n;
       else if (l.includes("storage") || l.includes("indexeddb") || l.includes("cache")) t.storage += n;
       else if (l.includes("url") || l.includes("tracker") || l.includes("string")) t.urls += n;
-      else if (l.includes("file") || l.includes("organi")) t.files += n;
+      else if (l.includes("scan")) t.files += n;
     }
   }
   return t;
@@ -185,12 +189,12 @@ function renderReport() {
   if (emptyNote) emptyNote.hidden = entries.length > 0;
   list.innerHTML = entries.map((e) => {
     const when = new Date(e.ts).toLocaleString();
-    const detail = (e.items || []).map((i) => `<li><span>${i.label}</span><strong>${i.value}</strong></li>`).join("");
+    const detail = (e.items || []).map((i) => `<li><span>${escapeHtml(i.label)}</span><strong>${escapeHtml(i.value)}</strong></li>`).join("");
     const gb = e.bytes ? `<span class="report-gb">${fmtBytes(e.bytes)} freed</span>` : "";
     return `<li class="report-entry">
       <div class="report-entry-head">
-        <span class="report-icon">${e.icon}</span>
-        <div class="report-title">${e.title}</div>
+        <span class="report-icon">${escapeHtml(e.icon)}</span>
+        <div class="report-title">${escapeHtml(e.title)}</div>
         ${gb}
         <time>${when}</time>
       </div>
