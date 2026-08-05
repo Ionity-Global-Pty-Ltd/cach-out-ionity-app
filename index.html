@@ -22,6 +22,11 @@
   <link rel="icon" href="./favicon.ico" sizes="any">
   <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png">
   <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+  <!-- Google Fonts: Inter (UI) + Roboto Mono (code) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap">
+
   <link rel="stylesheet" href="./styles.css">
 
   <script type="application/ld+json">
@@ -42,111 +47,168 @@
   </script>
 </head>
 <body>
+
+  <!-- Toast container -->
+  <div id="toast-container" class="toast-container" aria-live="assertive" aria-atomic="true"></div>
+
+  <!-- Sticky top nav -->
+  <header class="top-nav">
+    <div class="top-nav-inner">
+      <div class="nav-brand">
+        <img src="./icons/hero-mark.png" alt="IONITY" width="32" height="32" class="nav-mark">
+        <span class="nav-title">CACH OUT</span>
+        <span class="nav-by">by Ionity</span>
+      </div>
+      <nav class="top-tabs" role="tablist">
+        <button class="tab active" data-tab="clean" type="button"><span class="tab-icon">🧹</span><span class="tab-label">Privacy</span></button>
+        <button class="tab" data-tab="network" type="button"><span class="tab-icon">🔌</span><span class="tab-label">Network</span></button>
+        <button class="tab" data-tab="organize" type="button"><span class="tab-icon">🗂️</span><span class="tab-label">Files</span></button>
+        <button class="tab" data-tab="report" type="button"><span class="tab-icon">📋</span><span class="tab-label">Report</span></button>
+      </nav>
+    </div>
+  </header>
+
   <main class="app-shell">
-    <header class="hero">
-      <div class="hero-brand">
-        <img class="brand-mark" src="./icons/hero-mark.png" alt="IONITY AI mark" width="48" height="48">
-        <div>
-          <p class="brand">IONITY GLOBAL · IONITY.CO.ZA</p>
-          <h1>CACH OUT Ionity App</h1>
+
+    <!-- Hero -->
+    <header class="hero animate-in">
+      <div class="hero-inner">
+        <div class="hero-brand">
+          <div class="brand-mark-wrap">
+            <img class="brand-mark" src="./icons/hero-mark.png" alt="IONITY AI mark" width="64" height="64">
+            <div class="brand-mark-glow"></div>
+          </div>
+          <div>
+            <p class="brand">IONITY GLOBAL · IONITY.CO.ZA</p>
+            <h1>CACH OUT <span class="hero-accent">Ionity</span></h1>
+          </div>
+        </div>
+        <p class="subtitle">One-click privacy reset — wipe this site's cookies, caches, storage, service workers and tracking strings. Powered by on-device AI. <strong>100% local.</strong></p>
+        <button id="app-update" class="update-pill" type="button" hidden>⟳ Update available — click to refresh</button>
+      </div>
+
+      <!-- Quick action cards -->
+      <div class="quick-actions">
+        <div class="qa-card" data-qa="clean">
+          <div class="qa-icon">🧹</div>
+          <div class="qa-label">Deep Clean</div>
+          <div class="qa-desc">Wipe cookies, caches &amp; storage</div>
+        </div>
+        <div class="qa-card" data-qa="scan">
+          <div class="qa-icon">🤖</div>
+          <div class="qa-label">AI Scan</div>
+          <div class="qa-desc">Score your privacy exposure</div>
+        </div>
+        <div class="qa-card" data-qa="link">
+          <div class="qa-icon">🔗</div>
+          <div class="qa-label">Clean Link</div>
+          <div class="qa-desc">Strip trackers from any URL</div>
+        </div>
+        <div class="qa-card" data-qa="network">
+          <div class="qa-icon">🔌</div>
+          <div class="qa-label">Network Test</div>
+          <div class="qa-desc">Azure Cloud Shell diagnostics</div>
         </div>
       </div>
-      <p class="subtitle">One-click privacy reset — wipe this site's cookies, caches, storage, service workers and tracking strings. Includes an on-device AI privacy advisor.</p>
-      <button id="app-update" class="update-pill" type="button" hidden>⟳ Update available — click to refresh</button>
     </header>
 
-    <section class="panel banner">
-      <div>
+    <!-- Download banner -->
+    <section class="panel banner animate-in" style="--delay:.05s">
+      <div class="banner-text">
         <h2>🧩 Want to clear <em>every</em> site &amp; flush DNS?</h2>
         <p class="hint">A web page can only clear its own site's data (browser security). For everything else, grab a real tool: the <strong>browser extension</strong> clears cache/cookies/storage across <strong>all</strong> sites, and the <strong>Windows desktop app</strong> also flushes DNS, wipes every browser's cache and resets your network stack.</p>
+        <p class="hint" style="margin-top:.5rem">v2.0.0 — compiled &amp; digitally signed .NET app. Publisher: <strong>Ionity Global (Pty) Ltd</strong>. <a href="https://github.com/Ionity-Global-Pty-Ltd/cach-out-ionity-app/releases/latest" target="_blank" rel="noopener">Verify signature &amp; checksum →</a></p>
       </div>
       <div class="banner-actions">
-        <a class="primary btn-link" href="https://github.com/Ionity-Global-Pty-Ltd/cach-out-ionity-app/releases/latest/download/CACH-OUT-Ionity.exe">⬇ Download the app (.exe)</a>
+        <a class="primary btn-link" href="https://github.com/Ionity-Global-Pty-Ltd/cach-out-ionity-app/releases/latest/download/CACH-OUT-Ionity.exe">⬇ Download app (.exe)</a>
         <a class="secondary btn-link" href="https://github.com/Ionity-Global-Pty-Ltd/cach-out-ionity-app/tree/master/extension" target="_blank" rel="noopener">🧩 Browser extension</a>
       </div>
-      <p class="hint" style="margin-top:.6rem">v2.0.0 — a real compiled &amp; digitally signed .NET app (no PowerShell wrapper). Publisher: <strong>Ionity Global (Pty) Ltd</strong>, timestamped &amp; SHA-256 checksummed. <a href="https://github.com/Ionity-Global-Pty-Ltd/cach-out-ionity-app/releases/latest" target="_blank" rel="noopener">Verify the signature &amp; checksum →</a></p>
     </section>
 
-    <nav class="tabs" role="tablist">
-      <button class="tab active" data-tab="clean" type="button">🧹 Privacy Reset</button>
-      <button class="tab" data-tab="network" type="button">🔌 Cloud Shell</button>
-      <button class="tab" data-tab="organize" type="button">🗂️ File Organizer</button>
-      <button class="tab" data-tab="report" type="button">📋 Report Log</button>
-    </nav>
+    <!-- ═══ PRIVACY RESET TAB ═══ -->
 
-    <section class="panel ai-panel" data-group="network">
+    <!-- Deep clean panel -->
+    <section class="panel animate-in" data-group="clean" style="--delay:.1s">
       <div class="panel-head">
-        <h2>🔌 Connectivity Doctor <small style="font-weight:400;color:var(--ionity-text-muted)">· Azure Cloud Shell</small></h2>
-        <span id="conn-status" class="badge">idle</span>
-      </div>
-      <p class="hint">Runs <strong>automatically</strong>. Tests whether Azure Cloud Shell can reach its servers and open its <strong>WebSocket terminal</strong> from this network — the exact thing that fails with <em>"failed to request a terminal."</em> Detects proxy / SSL-inspection blocking. Nothing is uploaded.</p>
-      <div class="button-row">
-        <button id="conn-retest" class="primary" type="button">Re-run tests</button>
-        <button id="conn-explain" class="secondary" type="button" disabled>Explain &amp; fix with AI</button>
-      </div>
-      <ul id="conn-results" class="result-list" aria-live="polite"></ul>
-      <div id="conn-verdict" class="link-verdict" hidden></div>
-      <div id="conn-explanation" class="ai-explanation" hidden></div>
-    </section>
-
-    <section class="panel" data-group="clean">
-      <div class="panel-head">
-        <h2>Deep clean</h2>
+        <div class="panel-title-group">
+          <span class="panel-icon">🧹</span>
+          <div>
+            <h2>Deep Clean</h2>
+            <p class="panel-sub">Site-scoped privacy reset</p>
+          </div>
+        </div>
         <span id="storage-estimate" class="badge">storage: —</span>
       </div>
 
+      <!-- Progress bar (hidden until cleaning) -->
+      <div id="clean-progress" class="progress-bar" hidden><div class="progress-fill"></div></div>
+
       <div class="options">
-        <label class="toggle">
+        <label class="toggle-sw">
           <input id="opt-cookies" type="checkbox" checked>
-          <span>Cookies (current-site scope)</span>
+          <span class="sw-track"><span class="sw-thumb"></span></span>
+          <span class="sw-label">Cookies <em>(current-site scope)</em></span>
         </label>
-        <label class="toggle">
+        <label class="toggle-sw">
           <input id="opt-storage" type="checkbox" checked>
-          <span>Local / session storage &amp; <code>window.name</code></span>
+          <span class="sw-track"><span class="sw-thumb"></span></span>
+          <span class="sw-label">Local / session storage &amp; <code>window.name</code></span>
         </label>
-        <label class="toggle">
+        <label class="toggle-sw">
           <input id="opt-caches" type="checkbox" checked>
-          <span>CacheStorage buckets</span>
+          <span class="sw-track"><span class="sw-thumb"></span></span>
+          <span class="sw-label">CacheStorage buckets</span>
         </label>
-        <label class="toggle">
+        <label class="toggle-sw">
           <input id="opt-idb" type="checkbox" checked>
-          <span>IndexedDB databases</span>
+          <span class="sw-track"><span class="sw-thumb"></span></span>
+          <span class="sw-label">IndexedDB databases</span>
         </label>
-        <label class="toggle">
+        <label class="toggle-sw">
           <input id="opt-sw" type="checkbox" checked>
-          <span>Service workers</span>
+          <span class="sw-track"><span class="sw-thumb"></span></span>
+          <span class="sw-label">Service workers</span>
         </label>
-        <label class="toggle">
+        <label class="toggle-sw">
           <input id="opt-url" type="checkbox" checked>
-          <span>Remove URL query strings &amp; hash</span>
+          <span class="sw-track"><span class="sw-thumb"></span></span>
+          <span class="sw-label">Remove URL query strings &amp; hash</span>
         </label>
-        <label class="toggle">
+        <label class="toggle-sw">
           <input id="opt-reload" type="checkbox">
-          <span>Hard reload (bypass HTTP cache) after clean</span>
+          <span class="sw-track"><span class="sw-thumb"></span></span>
+          <span class="sw-label">Hard reload after clean</span>
         </label>
       </div>
 
       <div class="button-row">
-        <button id="deep-clean" class="primary" type="button">⚡ Deep clean now</button>
-        <button id="sanitize-url" class="secondary" type="button">Sanitize URL only</button>
-        <button id="hard-reload" class="ghost" type="button">Hard reload</button>
-        <button id="install-app" class="ghost" type="button" hidden>Install app</button>
+        <button id="deep-clean" class="primary btn-icon" type="button"><span>⚡</span> Deep clean now</button>
+        <button id="sanitize-url" class="secondary btn-icon" type="button"><span>🔗</span> Sanitize URL</button>
+        <button id="hard-reload" class="ghost btn-icon" type="button"><span>↺</span> Hard reload</button>
+        <button id="install-app" class="ghost btn-icon" type="button" hidden><span>📲</span> Install app</button>
       </div>
 
-      <p class="hint">
-        A web page can only clear data for its own site scope. HttpOnly cookies, OS DNS cache, and browser-wide history need the OS/browser tools in the next panels.
+      <p class="hint" style="margin-top:var(--ionity-space-4)">
+        A web page can only clear data for its own site scope. HttpOnly cookies, OS DNS cache, and browser-wide history need the OS/browser tools in the panels below.
       </p>
     </section>
 
-    <section class="panel ai-panel" data-group="clean">
+    <!-- AI Privacy Advisor -->
+    <section class="panel ai-panel animate-in" data-group="clean" style="--delay:.15s">
       <div class="panel-head">
-        <h2>🤖 AI Privacy Advisor</h2>
-        <span id="ai-status" class="badge">on-device: checking…</span>
+        <div class="panel-title-group">
+          <span class="panel-icon">🤖</span>
+          <div>
+            <h2>AI Privacy Advisor</h2>
+            <p class="panel-sub">On-device tracker detection</p>
+          </div>
+        </div>
+        <span id="ai-status" class="badge badge-ai">checking…</span>
       </div>
-      <p class="hint">Scans this site's cookies and storage, scores your privacy exposure, flags known trackers, and (when your browser supports on-device AI) explains findings in plain language. Runs 100% locally — nothing is uploaded.</p>
+      <p class="hint">Scans this site's cookies and storage, scores your privacy exposure, flags known trackers, and explains findings in plain language. Runs <strong>100% locally</strong> — nothing is uploaded.</p>
       <div class="button-row">
-        <button id="ai-scan" class="primary" type="button">Scan &amp; analyse</button>
-        <button id="ai-explain" class="secondary" type="button" disabled>Explain with AI</button>
+        <button id="ai-scan" class="primary btn-icon" type="button"><span>🔍</span> Scan &amp; analyse</button>
+        <button id="ai-explain" class="secondary btn-icon" type="button" disabled><span>💬</span> Explain with AI</button>
       </div>
 
       <div id="ai-score-wrap" class="score-wrap" hidden>
@@ -161,17 +223,24 @@
       <div id="ai-explanation" class="ai-explanation" hidden></div>
     </section>
 
-    <section class="panel ai-panel" data-group="clean">
+    <!-- Smart Link Cleaner -->
+    <section class="panel ai-panel animate-in" data-group="clean" style="--delay:.2s">
       <div class="panel-head">
-        <h2>🔗 AI Smart Link Cleaner</h2>
-        <span class="badge">tracker vs login-safe</span>
+        <div class="panel-title-group">
+          <span class="panel-icon">🔗</span>
+          <div>
+            <h2>AI Smart Link Cleaner</h2>
+            <p class="panel-sub">Tracker vs login-safe</p>
+          </div>
+        </div>
+        <span class="badge">tracker-safe</span>
       </div>
-      <p class="hint">Paste <em>any</em> link — even a sign-in / OAuth URL like the ones that never seem to clean up. The advisor sorts every string into <strong>trackers</strong> you can safely strip and <strong>login tokens</strong> you must keep (removing those breaks the login), then hands you a clean, shareable version. Runs 100% locally.</p>
+      <p class="hint">Paste <em>any</em> link — even a sign-in / OAuth URL. The advisor sorts every query string into <strong>trackers</strong> you can safely strip and <strong>login tokens</strong> you must keep, then gives you a clean, shareable version. Runs 100% locally.</p>
       <textarea id="link-input" class="link-input" rows="3" spellcheck="false" placeholder="https://example.com/page?utm_source=news&gclid=abc123&id=42"></textarea>
       <div class="button-row">
-        <button id="link-analyze" class="primary" type="button">Analyse link</button>
-        <button id="link-paste" class="ghost" type="button">Paste from clipboard</button>
-        <button id="link-explain" class="secondary" type="button" disabled>Explain with AI</button>
+        <button id="link-analyze" class="primary btn-icon" type="button"><span>🧹</span> Analyse link</button>
+        <button id="link-paste" class="ghost btn-icon" type="button"><span>📋</span> Paste from clipboard</button>
+        <button id="link-explain" class="secondary btn-icon" type="button" disabled><span>💬</span> Explain with AI</button>
       </div>
       <div id="link-verdict" class="link-verdict" hidden></div>
       <ul id="link-params" class="result-list" aria-live="polite"></ul>
@@ -185,32 +254,80 @@
       <div id="link-explanation" class="ai-explanation" hidden></div>
     </section>
 
-    <section class="panel" data-group="clean">
-      <h2>🌐 DNS flush &amp; OS-level reset</h2>
-      <p class="hint">Browsers can't flush the operating-system DNS cache from JavaScript. Copy the command for your platform and run it in a terminal, or open the browser's internal DNS page.</p>
+    <!-- DNS panel -->
+    <section class="panel animate-in" data-group="clean" style="--delay:.25s">
+      <div class="panel-head">
+        <div class="panel-title-group">
+          <span class="panel-icon">🌐</span>
+          <div>
+            <h2>DNS Flush &amp; OS Reset</h2>
+            <p class="panel-sub">Terminal commands</p>
+          </div>
+        </div>
+      </div>
+      <p class="hint">Browsers can't flush the OS DNS cache from JavaScript. Copy the command for your platform and run it in a terminal, or open the browser's internal DNS page.</p>
       <div class="cmd-list" id="cmd-list"></div>
-      <div class="button-row">
-        <button class="ghost" type="button" data-open="chrome://net-internals/#dns">Open Chrome DNS</button>
-        <button class="ghost" type="button" data-open="about:networking#dns">Open Firefox DNS</button>
-        <button class="ghost" type="button" data-open="edge://net-internals/#dns">Open Edge DNS</button>
+      <div class="button-row" style="margin-top:var(--ionity-space-4)">
+        <button class="ghost btn-icon" type="button" data-open="chrome://net-internals/#dns"><span>🌐</span> Chrome DNS</button>
+        <button class="ghost btn-icon" type="button" data-open="about:networking#dns"><span>🦊</span> Firefox DNS</button>
+        <button class="ghost btn-icon" type="button" data-open="edge://net-internals/#dns"><span>🔷</span> Edge DNS</button>
       </div>
       <p class="hint" id="open-note"></p>
     </section>
 
-    <section class="panel" data-group="clean">
-      <h2>Last run log</h2>
-      <p id="last-run">Not run yet.</p>
+    <!-- Last run log -->
+    <section class="panel animate-in" data-group="clean" style="--delay:.3s">
+      <div class="panel-head">
+        <div class="panel-title-group">
+          <span class="panel-icon">📝</span>
+          <div><h2>Last Run Log</h2></div>
+        </div>
+      </div>
+      <p id="last-run" class="last-run-stamp">Not run yet.</p>
       <ul id="result-list" class="result-list" aria-live="polite"></ul>
     </section>
 
-    <section class="panel organizer" data-group="organize">
+    <!-- ═══ NETWORK TAB ═══ -->
+    <section class="panel ai-panel animate-in" data-group="network" style="--delay:.1s">
       <div class="panel-head">
-        <h2>🗂️ AI File Organizer</h2>
+        <div class="panel-title-group">
+          <span class="panel-icon">🔌</span>
+          <div>
+            <h2>Connectivity Doctor</h2>
+            <p class="panel-sub">Azure Cloud Shell</p>
+          </div>
+        </div>
+        <span id="conn-status" class="badge">idle</span>
+      </div>
+      <p class="hint">Runs <strong>automatically</strong>. Tests whether Azure Cloud Shell can reach its servers and open its <strong>WebSocket terminal</strong> from this network — the exact thing that fails with <em>"failed to request a terminal."</em> Detects proxy / SSL-inspection blocking. Nothing is uploaded.</p>
+
+      <!-- Progress bar -->
+      <div id="conn-progress" class="progress-bar" hidden><div class="progress-fill"></div></div>
+
+      <div class="button-row">
+        <button id="conn-retest" class="primary btn-icon" type="button"><span>🔄</span> Re-run tests</button>
+        <button id="conn-explain" class="secondary btn-icon" type="button" disabled><span>💬</span> Explain &amp; fix with AI</button>
+      </div>
+      <ul id="conn-results" class="result-list" aria-live="polite"></ul>
+      <div id="conn-verdict" class="link-verdict" hidden></div>
+      <div id="conn-explanation" class="ai-explanation" hidden></div>
+    </section>
+
+    <!-- ═══ FILE ORGANIZER TAB ═══ -->
+    <section class="panel organizer animate-in" data-group="organize" style="--delay:.1s">
+      <div class="panel-head">
+        <div class="panel-title-group">
+          <span class="panel-icon">🗂️</span>
+          <div>
+            <h2>AI File Organizer</h2>
+            <p class="panel-sub">Downloads &amp; Documents</p>
+          </div>
+        </div>
         <span id="org-status" class="badge">ready</span>
       </div>
       <div class="org-intro">
-        <img src="./brand/assets/ionity-logo.png" alt="IONITY" class="org-logo" width="120" loading="lazy">
-        <p class="hint">Tidies your <strong>Downloads</strong> and <strong>Documents</strong> folders by moving files into type folders (Images, Documents, Video, Audio, Archives, Installers…). It <strong>never deletes</strong> anything — it only relocates, and duplicates are just flagged. Everything runs on your device; no file ever leaves your computer.</p>
+        <img src="./brand/assets/ionity-logo.png" alt="IONITY" class="org-logo" width="96" loading="lazy">
+        <p class="hint">Tidies your <strong>Downloads</strong> and <strong>Documents</strong> folders by moving files into type folders (Images, Documents, Video, Audio, Archives, Installers…). It <strong>never deletes</strong> anything — only relocates. Duplicates are flagged. Everything runs on your device.</p>
       </div>
 
       <div id="org-unsupported" class="link-verdict warn" hidden>
@@ -218,18 +335,22 @@
       </div>
 
       <div id="org-controls" hidden>
-        <label class="toggle" style="margin:8px 0">
-          <input id="org-apply" type="checkbox">
-          <span>Actually move files (off = safe preview only)</span>
-        </label>
-        <label class="toggle" style="margin:0 0 12px">
-          <input id="org-dupes" type="checkbox" checked>
-          <span>Scan for duplicate files (content hash — flags only, never deletes)</span>
-        </label>
+        <div class="org-toggles">
+          <label class="toggle-sw">
+            <input id="org-apply" type="checkbox">
+            <span class="sw-track"><span class="sw-thumb"></span></span>
+            <span class="sw-label">Actually move files <em>(off = safe preview only)</em></span>
+          </label>
+          <label class="toggle-sw">
+            <input id="org-dupes" type="checkbox" checked>
+            <span class="sw-track"><span class="sw-thumb"></span></span>
+            <span class="sw-label">Scan for duplicates <em>(content hash — flags only, never deletes)</em></span>
+          </label>
+        </div>
         <div class="button-row">
-          <button id="org-downloads" class="primary" type="button">📥 Organize Downloads</button>
-          <button id="org-documents" class="primary" type="button">📄 Organize Documents</button>
-          <button id="org-explain" class="secondary" type="button" disabled>AI recommendations</button>
+          <button id="org-downloads" class="primary btn-icon" type="button"><span>📥</span> Organize Downloads</button>
+          <button id="org-documents" class="primary btn-icon" type="button"><span>📄</span> Organize Documents</button>
+          <button id="org-explain" class="secondary btn-icon" type="button" disabled><span>💡</span> AI recommendations</button>
         </div>
       </div>
 
@@ -239,20 +360,26 @@
       <div id="org-explanation" class="ai-explanation" hidden></div>
     </section>
 
-    <section class="panel report" data-group="report">
+    <!-- ═══ REPORT TAB ═══ -->
+    <section class="panel report animate-in" data-group="report" style="--delay:.1s">
       <div class="panel-head">
-        <img src="./brand/assets/ionity-logo.png" alt="IONITY" class="report-logo" width="110" loading="lazy">
+        <div class="panel-title-group">
+          <span class="panel-icon">📋</span>
+          <div>
+            <h2>Activity Report</h2>
+            <p class="panel-sub">On-device, never uploaded</p>
+          </div>
+        </div>
         <span id="report-count-badge" class="badge">0 runs</span>
       </div>
-      <h2>📋 Activity Report</h2>
-      <p class="hint">A running record of everything CACH OUT has done on this device — how much storage was reclaimed, cookies and site data cleared, URLs sanitised and folders organised. Stored only on your device and <strong>kept safe even when you Deep Clean</strong>. Nothing is ever uploaded.</p>
+      <p class="hint">A running record of everything CACH OUT has done on this device — storage reclaimed, cookies and site data cleared, URLs sanitised and folders organised. Stored only on your device and <strong>kept safe even when you Deep Clean</strong>.</p>
 
       <div id="report-totals" class="report-totals" aria-live="polite"></div>
 
       <div class="button-row">
-        <button id="report-download" class="primary" type="button">⬇ Download report (.txt)</button>
-        <button id="report-download-json" class="secondary" type="button">⧉ Export JSON</button>
-        <button id="report-clear" class="ghost" type="button">🗑 Clear log</button>
+        <button id="report-download" class="primary btn-icon" type="button"><span>⬇</span> Download report (.txt)</button>
+        <button id="report-download-json" class="secondary btn-icon" type="button"><span>⧉</span> Export JSON</button>
+        <button id="report-clear" class="ghost btn-icon" type="button"><span>🗑</span> Clear log</button>
       </div>
 
       <ul id="report-list" class="report-list" aria-live="polite"></ul>
@@ -260,7 +387,13 @@
     </section>
 
     <footer class="foot">
-      <p><a href="https://www.ionity.co.za/" target="_blank" rel="noopener">www.ionity.co.za</a> · © Ionity Global (Pty) Ltd · Everything runs locally in your browser.</p>
+      <div class="foot-inner">
+        <img src="./brand/assets/ionity-logo.png" alt="IONITY" width="60" loading="lazy" class="foot-logo">
+        <div>
+          <p><a href="https://www.ionity.co.za/" target="_blank" rel="noopener">www.ionity.co.za</a> · © Ionity Global (Pty) Ltd</p>
+          <p class="foot-sub">Everything runs locally in your browser · Nothing is ever uploaded</p>
+        </div>
+      </div>
     </footer>
   </main>
 
