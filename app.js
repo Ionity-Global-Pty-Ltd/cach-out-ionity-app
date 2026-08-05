@@ -2,6 +2,23 @@
 // Ionity Global (Pty) Ltd · ionity.today
 
 /* ------------------------------------------------------------------ */
+/* Toast notifications                                                  */
+/* ------------------------------------------------------------------ */
+function showToast(msg, kind = "ok", duration = 3500) {
+  const container = document.getElementById("toast-container");
+  if (!container) return;
+  const icons = { ok: "✅", warn: "⚠️", err: "❌" };
+  const t = document.createElement("div");
+  t.className = `toast ${kind}`;
+  t.innerHTML = `<span class="toast-icon">${icons[kind] || "ℹ️"}</span><span>${msg}</span>`;
+  container.appendChild(t);
+  setTimeout(() => {
+    t.classList.add("toast-out");
+    t.addEventListener("animationend", () => t.remove(), { once: true });
+  }, duration);
+}
+
+/* ------------------------------------------------------------------ */
 /* Element refs                                                        */
 /* ------------------------------------------------------------------ */
 const $ = (id) => document.getElementById(id);
@@ -239,6 +256,16 @@ function downloadBlob(filename, text, type) {
 function setBusy(busy) {
   deepCleanButton.disabled = busy;
   sanitizeButton.disabled = busy;
+  const pb = $("clean-progress");
+  if (pb) {
+    pb.hidden = !busy;
+    if (busy) {
+      pb.querySelector(".progress-fill").style.width = "75%";
+    } else {
+      pb.querySelector(".progress-fill").style.width = "100%";
+      setTimeout(() => { pb.hidden = true; pb.querySelector(".progress-fill").style.width = "0%"; }, 400);
+    }
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -412,6 +439,7 @@ async function runDeepClean() {
 
     stampLastRun();
     logRun({ type: "clean", icon: "🧹", title: "Deep Clean", bytes: reclaimedBytes, items: logItems });
+    showToast(`Deep clean complete${reclaimedBytes ? ` — ${fmtBytes(reclaimedBytes)} freed` : ""}`, "ok");
 
     if (opt.reload.checked) {
       addResult("Reloading", "bypassing HTTP cache…");
@@ -419,6 +447,7 @@ async function runDeepClean() {
     }
   } catch (err) {
     addResult("Cleanup error", err instanceof Error ? err.message : String(err), "danger");
+    showToast("Clean encountered an error — see details below.", "err");
   } finally {
     setBusy(false);
   }
@@ -488,6 +517,8 @@ async function runScan() {
   }
 
   aiExplainButton.disabled = !(await ensureAiSession());
+  const kind = uniqueTrackers.length ? "warn" : "ok";
+  showToast(`Privacy score: ${score}/100 — ${uniqueTrackers.length ? `${uniqueTrackers.length} tracker(s) found` : "no trackers found 🎉"}`, kind);
   return lastScan;
 }
 
@@ -503,14 +534,20 @@ function aiApi() {
 
 async function detectAi() {
   const api = aiApi();
-  if (!api) { aiStatus.textContent = "on-device: unavailable"; return false; }
+  if (!api) {
+    aiStatus.textContent = "on-device: unavailable";
+    aiStatus.classList.remove("badge-ai");
+    return false;
+  }
   try {
     const availability = await (api.availability?.() ?? api.capabilities?.().then((c) => c.available));
     const ok = availability === "available" || availability === "readily" || availability === "downloadable" || availability === "after-download";
-    aiStatus.textContent = ok ? "on-device: ready" : "on-device: unavailable";
+    aiStatus.textContent = ok ? "on-device: ready ✓" : "on-device: unavailable";
+    aiStatus.classList.toggle("badge-ai", ok);
     return ok;
   } catch {
     aiStatus.textContent = "on-device: unavailable";
+    aiStatus.classList.remove("badge-ai");
     return false;
   }
 }
@@ -845,11 +882,19 @@ async function runConnDoctor() {
   connStatus.textContent = "testing…";
   connRetestBtn.disabled = true;
 
+  const pb = $("conn-progress");
+  if (pb) { pb.hidden = false; pb.querySelector(".progress-fill").style.width = "60%"; }
+
   const results = {};
   await Promise.all(CONN_ENDPOINTS.map(async (ep) => {
     const r = ep.kind === "ws" ? await testWebSocketTerminal(ep.url) : await testReachable(ep.url);
     results[ep.key] = { ...r, label: ep.label, kind: ep.kind };
   }));
+
+  if (pb) {
+    pb.querySelector(".progress-fill").style.width = "100%";
+    setTimeout(() => { pb.hidden = true; pb.querySelector(".progress-fill").style.width = "0%"; }, 400);
+  }
 
   // Render in defined order
   for (const ep of CONN_ENDPOINTS) connResults.appendChild(connRow(ep.label, results[ep.key]));
@@ -867,15 +912,18 @@ async function runConnDoctor() {
     connVerdict.innerHTML = `<strong>WebSocket to Cloud Shell is being blocked or stripped.</strong> ` +
       `This is the exact cause of <em>"failed to request a terminal."</em> Your proxy/firewall is decrypting or dropping the <code>wss://</code> upgrade. ` +
       `<strong>Fix:</strong> add <code>*.console.azure.com</code> and <code>*.servicebus.windows.net</code> to the proxy's <strong>do-not-decrypt (SSL-inspection bypass)</strong> list and allow WebSocket pass-through on 443.`;
+    showToast("WebSocket blocked — see verdict below.", "warn");
   } else if (blockedFetches.length) {
     connVerdict.className = "link-verdict warn";
     const names = blockedFetches.map((e) => e.label).join(", ");
     connVerdict.innerHTML = `<strong>WebSocket path is OK, but these endpoints are blocked:</strong> ${names}. ` +
       `Ask your admin to allowlist them on 443. Cloud Shell needs every row green.`;
+    showToast("Some endpoints blocked — see verdict.", "warn");
   } else {
     connVerdict.className = "link-verdict ok";
     connVerdict.innerHTML = `<strong>Network path is clean from this browser.</strong> Cloud Shell's servers and WebSocket terminal are reachable. ` +
       `If it still fails, the problem is your <strong>portal session</strong>, not the network — run a <strong>Deep clean</strong> above (clears portal.azure.com / login cookies), then retry in a fresh tab.`;
+    showToast("Network path is clean ✓", "ok");
   }
 
   connExplainBtn.disabled = !(await ensureAiSession());
@@ -1209,6 +1257,7 @@ sanitizeButton.addEventListener("click", () => {
   stampLastRun();
   logRun({ type: "sanitize", icon: "🔗", title: "URL sanitised", bytes: 0,
     items: [{ label: "URL strings removed", value: String(r.removed) }] });
+  showToast(`URL sanitised — ${r.removed} string${r.removed === 1 ? "" : "s"} removed`, r.removed ? "ok" : "warn");
 });
 hardReloadButton.addEventListener("click", hardReload);
 aiScanButton.addEventListener("click", runScan);
@@ -1262,6 +1311,17 @@ function activateTab(tab) {
 }
 document.querySelectorAll(".tab").forEach((b) => b.addEventListener("click", () => activateTab(b.dataset.tab)));
 activateTab("clean");
+
+// Quick-action cards
+document.querySelectorAll(".qa-card[data-qa]").forEach((card) => {
+  card.addEventListener("click", () => {
+    const qa = card.dataset.qa;
+    if (qa === "clean") { activateTab("clean"); deepCleanButton?.click(); }
+    else if (qa === "scan") { activateTab("clean"); aiScanButton?.click(); }
+    else if (qa === "link") { activateTab("clean"); linkInput?.focus(); linkInput?.scrollIntoView({ behavior: "smooth", block: "center" }); }
+    else if (qa === "network") { activateTab("network"); }
+  });
+});
 
 /* ------------------------------------------------------------------ */
 /* Boot                                                                */
